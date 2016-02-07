@@ -5,6 +5,8 @@
 ghc main.hs
 ./main sample.pl
 ```
+Mac OS X (Yosemite)上のHaskell Platformにおいてコンパイルできることを確認した (2015/07/31)
+
 対話環境では、基本的にPrologと同じコマンドが使える。
 
 ## swiplとの主な相違点
