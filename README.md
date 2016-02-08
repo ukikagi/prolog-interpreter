@@ -1,11 +1,17 @@
 # prolog-interpreter
 
-## 使い方
+## 使い方。
 ```
 ghc main.hs
 ./main sample.pl
 ```
 Mac OS X (Yosemite)上のHaskell Platformにおいてコンパイルできることを確認した (2015/07/31)
+
+parsecをインストールする必要がある。
+```
+cabal update
+cabal install parsec
+```
 
 対話環境では、基本的にPrologと同じコマンドが使える。
 
