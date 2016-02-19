@@ -7,7 +7,7 @@ ghc main.hs
 ```
 Mac OS X (Yosemite)上のHaskell Platformにおいてコンパイルできることを確認した (2015/07/31)
 
-parsecをインストールする必要がある。
+事前にparsecをインストールする必要がある。
 ```
 cabal update
 cabal install parsec
