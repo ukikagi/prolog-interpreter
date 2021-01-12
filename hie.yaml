@@ -1,0 +1,10 @@
+cradle:
+  cabal:
+    - path: "src"
+      component: "lib:prolog-interpreter"
+
+    - path: "app/Main.hs"
+      component: "prolog-interpreter:exe:prolog-interpreter"
+
+    - path: "test"
+      component: "prolog-interpreter:test:prolog-interpreter-test"
