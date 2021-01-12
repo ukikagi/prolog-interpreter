@@ -4,17 +4,17 @@ import Control.Monad (mapM_, unless, when)
 import Data.List (head)
 import Eval (answer)
 import qualified Parser
-import Syntax
+import Syntax (Prog, Subst, showSubst)
 import System.Environment (getArgs, getProgName)
-import System.Exit
-import System.IO
+import System.Exit (exitFailure)
+import System.IO (hFlush, stdout)
 import System.Posix.Signals
   ( Handler (Catch),
     installHandler,
     keyboardSignal,
   )
-import Text.Parsec
-import Text.Parsec.Error
+import Text.Parsec (parse)
+import Text.Parsec.Error ()
 import Text.Printf (printf)
 
 usage :: IO ()
@@ -34,31 +34,31 @@ main =
         do
           installHandler
             keyboardSignal
-            (Catch $ putStr "\n" >> rep_loop prog)
+            (Catch $ putStr "\n" >> repLoop prog)
             Nothing
-          rep_loop prog
+          repLoop prog
 
 putStrLns :: [String] -> IO ()
-putStrLns strs = mapM_ putStrLn strs
+putStrLns = mapM_ putStrLn
 
-rep_loop :: Prog -> IO ()
-rep_loop prog =
+repLoop :: Prog -> IO ()
+repLoop prog =
   do
     putStr "?- " >> hFlush stdout
     line <- getLine
     case parse Parser.query "" line of
       Left _ ->
-        putStrLn "Error: Parse error." >> rep_loop prog
+        putStrLn "Error: Parse error." >> repLoop prog
       Right query ->
-        print_substs (answer prog query)
-          >> rep_loop prog
+        printSubsts (answer prog query)
+          >> repLoop prog
 
-print_substs :: [Subst] -> IO ()
-print_substs [] = putStrLn "false."
-print_substs sbs =
+printSubsts :: [Subst] -> IO ()
+printSubsts [] = putStrLn "false."
+printSubsts sbs =
   let (sbs1, sbs2) = splitAt 10 sbs
    in do
-        putStrLns $ map show_subst sbs1
-        if (null sbs2)
+        putStrLns $ map showSubst sbs1
+        if null sbs2
           then putStr "\n"
-          else getLine >> print_substs sbs2
+          else getLine >> printSubsts sbs2

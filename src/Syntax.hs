@@ -44,28 +44,28 @@ tNil = TComp "[]" []
 tCons :: Term -> Term -> Term
 tCons x xs = TComp "|" [x, xs]
 
-show_term :: Term -> String
-show_term Wild = "_"
-show_term (TInt n) = show n
-show_term (TVar x) = x
-show_term (TComp a []) = a
-show_term (TComp "|" [x, xs]) =
+showTerm :: Term -> String
+showTerm Wild = "_"
+showTerm (TInt n) = show n
+showTerm (TVar x) = x
+showTerm (TComp a []) = a
+showTerm (TComp "|" [x, xs]) =
   printf "[%s]" $ show_list x xs
   where
     show_list x xs =
       case xs of
-        TComp "[]" [] -> show_term x
-        TComp "|" [y, ys] -> show_term x ++ ", " ++ show_list y ys
-        _ -> show_term x ++ "|" ++ show_term xs
-show_term (TComp f ts) =
-  printf "%s(%s)" f $ intercalate ", " $ map show_term ts
+        TComp "[]" [] -> showTerm x
+        TComp "|" [y, ys] -> showTerm x ++ ", " ++ show_list y ys
+        _ -> showTerm x ++ "|" ++ showTerm xs
+showTerm (TComp f ts) =
+  printf "%s(%s)" f $ intercalate ", " $ map showTerm ts
 
-show_subst :: Subst -> String
-show_subst sb =
+showSubst :: Subst -> String
+showSubst sb =
   if null sb
     then "true."
     else
       intercalate
         ", "
-        [printf "%s = %s" x $ show_term t | (x, t) <- Map.toList sb]
+        [printf "%s = %s" x $ showTerm t | (x, t) <- Map.toList sb]
         ++ "."
