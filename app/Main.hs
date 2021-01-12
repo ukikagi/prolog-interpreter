@@ -1,20 +1,16 @@
 module Main where
 
 import Control.Monad (mapM_, unless, when)
+import Control.Monad.Trans.Class (lift)
 import Data.List (head)
 import Eval (answer)
 import qualified Parser
 import Syntax (Prog, Subst, showSubst)
+import System.Console.Haskeline (InputT, defaultSettings, getInputLine, runInputT)
 import System.Environment (getArgs, getProgName)
 import System.Exit (exitFailure)
 import System.IO (hFlush, stdout)
-import System.Posix.Signals
-  ( Handler (Catch),
-    installHandler,
-    keyboardSignal,
-  )
 import Text.Parsec (parse)
-import Text.Parsec.Error ()
 import Text.Printf (printf)
 
 usage :: IO ()
@@ -30,28 +26,24 @@ main =
     str <- readFile $ head args
     case parse Parser.prog "" str of
       Left _ -> putStrLn "Error: Parse error." >> exitFailure
-      Right prog ->
-        do
-          installHandler
-            keyboardSignal
-            (Catch $ putStr "\n" >> repLoop prog)
-            Nothing
-          repLoop prog
+      Right prog -> runInputT defaultSettings (repLoop prog)
 
 putStrLns :: [String] -> IO ()
 putStrLns = mapM_ putStrLn
 
-repLoop :: Prog -> IO ()
+repLoop :: Prog -> InputT IO ()
 repLoop prog =
   do
-    putStr "?- " >> hFlush stdout
-    line <- getLine
-    case parse Parser.query "" line of
-      Left _ ->
-        putStrLn "Error: Parse error." >> repLoop prog
-      Right query ->
-        printSubsts (answer prog query)
-          >> repLoop prog
+    minput <- getInputLine "?- "
+    case minput of
+      Nothing -> return ()
+      Just line ->
+        case parse Parser.query "" line of
+          Left _ ->
+            lift (putStrLn "Error: Parse error.") >> repLoop prog
+          Right query ->
+            lift (printSubsts $ answer prog query)
+              >> repLoop prog
 
 printSubsts :: [Subst] -> IO ()
 printSubsts [] = putStrLn "false."
