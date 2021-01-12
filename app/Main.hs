@@ -1,3 +1,5 @@
+module Main where
+
 import System.Environment (getArgs, getProgName)
 import System.Exit
 import System.IO
