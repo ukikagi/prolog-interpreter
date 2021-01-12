@@ -1,19 +1,15 @@
 # prolog-interpreter
 
-## 使い方。
+## Example
 ```
-ghc main.hs
-./main sample.pl
+cabal run :prolog-interpreter sample.pl
 ```
-Mac OS X (Yosemite)上のHaskell Platformにおいてコンパイルできることを確認した (2015/07/31)
-
-事前にparsecをインストールする必要がある。
 ```
-cabal update
-cabal install parsec
+?- mother(X, Y).
+X = kobo, Y = sanae.
+X = miho, Y = sanae.
+X = sanae, Y = mine.
 ```
-
-対話環境では、基本的にPrologと同じコマンドが使える。
 
 ## swiplとの主な相違点
 - 幅優先探索を使うことで完全性を得ている
