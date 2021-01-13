@@ -1,6 +1,6 @@
 module Syntax where
 
-import Data.List (intercalate, nub)
+import Data.List (intercalate)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Text.Printf (printf)
@@ -52,11 +52,11 @@ showTerm (TComp a []) = a
 showTerm (TComp "|" [x, xs]) =
   printf "[%s]" $ show_list x xs
   where
-    show_list x xs =
-      case xs of
-        TComp "[]" [] -> showTerm x
-        TComp "|" [y, ys] -> showTerm x ++ ", " ++ show_list y ys
-        _ -> showTerm x ++ "|" ++ showTerm xs
+    show_list y ys =
+      case ys of
+        TComp "[]" [] -> showTerm y
+        TComp "|" [z, zs] -> showTerm y ++ ", " ++ show_list z zs
+        _ -> showTerm y ++ "|" ++ showTerm ys
 showTerm (TComp f ts) =
   printf "%s(%s)" f $ intercalate ", " $ map showTerm ts
 

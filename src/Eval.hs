@@ -1,24 +1,23 @@
 module Eval where
 
-import Data.List (intercalate, nub)
-import Data.Map (Map)
+import Data.List (nub)
+import Data.Map ()
 import qualified Data.Map as Map
-import Data.Maybe (mapMaybe)
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Syntax
   ( Constr,
     Prog,
-    Prop (..),
+    Prop (Prop),
     Query,
-    Rule (..),
+    Rule (Rule),
     Subst,
-    Term (..),
+    Term (TComp, TInt, TVar, Wild),
     Var,
   )
 
 answerSub :: Prog -> [(Query, Subst)] -> [Subst]
-answerSub prog [] = []
+answerSub _ [] = []
 answerSub prog (([], sb) : res) = sb : answerSub prog res
 answerSub prog ((q : qs, sb) : res) =
   answerSub prog (res ++ adding)
@@ -35,12 +34,12 @@ answer :: Prog -> Query -> [Subst]
 answer prog query =
   let vars = Set.unions (map varsProp query)
    in nub $
-        map (Map.filterWithKey (\k a -> Set.member k vars)) $
+        map (Map.filterWithKey (\k _ -> Set.member k vars)) $
           answerSub prog [(query, Map.empty)]
 
 subst :: Subst -> Term -> Term
-subst sb Wild = Wild
-subst sb (TInt n) = TInt n
+subst _ Wild = Wild
+subst _ (TInt n) = TInt n
 subst sb (TVar v) =
   case Map.lookup v sb of
     Just t -> t
@@ -62,19 +61,19 @@ compose :: Subst -> Subst -> Subst
 compose sb2 sb1 = Map.union (Map.map (subst sb2) sb1) sb2
 
 appear :: Var -> Term -> Bool
-appear x Wild = False
-appear x (TInt _) = False
+appear _ Wild = False
+appear _ (TInt _) = False
 appear x (TVar y) = x == y
 appear x (TComp _ xs) = any (appear x) xs
 
-vars :: Term -> Set Var
-vars Wild = Set.empty
-vars (TInt _) = Set.empty
-vars (TVar x) = Set.singleton x
-vars (TComp f ts) = Set.unions (map vars ts)
+varsIn :: Term -> Set Var
+varsIn Wild = Set.empty
+varsIn (TInt _) = Set.empty
+varsIn (TVar x) = Set.singleton x
+varsIn (TComp _ ts) = Set.unions (map varsIn ts)
 
 varsProp :: Prop -> Set Var
-varsProp (Prop r ts) = Set.unions (map vars ts)
+varsProp (Prop _ ts) = Set.unions (map varsIn ts)
 
 varsQuery :: Query -> Set Var
 varsQuery ps = Set.unions (map varsProp ps)
@@ -88,13 +87,13 @@ freshRule taboovars rule =
    in let newtvars =
             take
               (length oldvars)
-              [TVar v | i <- [1 ..], let v = "X" ++ show i, v `notElem` taboovars]
+              [TVar v | i <- [1 :: Integer ..], let v = "X" ++ show i, v `notElem` taboovars]
        in substRule (Map.fromList $ zip oldvars newtvars) rule
 
 unify :: Constr -> Maybe Subst
 unify [] = Just Map.empty
-unify ((Wild, t) : constr) = unify constr
-unify ((t, Wild) : constr) = unify constr
+unify ((Wild, _) : constr) = unify constr
+unify ((_, Wild) : constr) = unify constr
 unify ((TVar x, t) : constr)
   | t == TVar x = unify constr
   | appear x t = Nothing

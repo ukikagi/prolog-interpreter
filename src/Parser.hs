@@ -4,10 +4,10 @@ import Data.Functor (($>))
 import Syntax
   ( Atom,
     Prog,
-    Prop (..),
+    Prop (Prop),
     Query,
-    Rule (..),
-    Term (..),
+    Rule (Rule),
+    Term (TComp, TInt, TVar, Wild),
     Var,
     tCons,
     tNil,

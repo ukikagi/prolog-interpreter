@@ -1,12 +1,11 @@
 module Main where
 
-import Control.Monad (mapM_, unless, when)
-import Control.Monad.Trans.Class (lift)
-import Data.List (head, intercalate)
+import Control.Monad (when)
+import Data.List (intercalate)
 import Eval (answer)
 import qualified Parser
 import Syntax (Prog, Subst, showSubst)
-import System.Console.Haskeline (InputT, defaultSettings, getInputLine, outputStr, outputStrLn, runInputT, waitForAnyKey)
+import System.Console.Haskeline (InputT, defaultSettings, getInputLine, outputStrLn, runInputT, waitForAnyKey)
 import System.Environment (getArgs, getProgName)
 import System.Exit (exitFailure)
 import Text.Parsec (parse)
