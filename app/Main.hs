@@ -2,14 +2,13 @@ module Main where
 
 import Control.Monad (mapM_, unless, when)
 import Control.Monad.Trans.Class (lift)
-import Data.List (head)
+import Data.List (head, intercalate)
 import Eval (answer)
 import qualified Parser
 import Syntax (Prog, Subst, showSubst)
-import System.Console.Haskeline (InputT, defaultSettings, getInputLine, runInputT)
+import System.Console.Haskeline (InputT, defaultSettings, getInputLine, outputStr, outputStrLn, runInputT, waitForAnyKey)
 import System.Environment (getArgs, getProgName)
 import System.Exit (exitFailure)
-import System.IO (hFlush, stdout)
 import Text.Parsec (parse)
 import Text.Printf (printf)
 
@@ -40,17 +39,21 @@ repLoop prog =
       Just line ->
         case parse Parser.query "" line of
           Left _ ->
-            lift (putStrLn "Error: Parse error.") >> repLoop prog
+            outputStrLn "Error: Parse error." >> repLoop prog
           Right query ->
-            lift (printSubsts $ answer prog query)
+            printSubsts (answer prog query)
               >> repLoop prog
 
-printSubsts :: [Subst] -> IO ()
-printSubsts [] = putStrLn "false."
+printSubsts :: [Subst] -> InputT IO ()
+printSubsts [] = outputStrLn "false."
 printSubsts sbs =
   let (sbs1, sbs2) = splitAt 10 sbs
    in do
-        putStrLns $ map showSubst sbs1
+        outputStrLn $ intercalate "\n" $ map showSubst sbs1
         if null sbs2
-          then putStr "\n"
-          else getLine >> printSubsts sbs2
+          then outputStrLn ""
+          else do
+            b <- waitForAnyKey "[Press any key to proceed or Ctrl-D to abort]"
+            if b
+              then printSubsts sbs2
+              else outputStrLn ""
