@@ -55,5 +55,5 @@ test-suite prolog-interpreter-test
   import:         shared-properties
   type:           exitcode-stdio-1.0
   main-is:        Test.hs
-  build-depends:
+  build-depends:  HUnit, prolog-interpreter
   hs-source-dirs: test
