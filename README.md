@@ -1,4 +1,5 @@
 # prolog-interpreter
+![Haskell CI](https://github.com/ukikagi/prolog-interpreter/workflows/Haskell%20CI/badge.svg?branch=master)
 
 ## Example
 ```
