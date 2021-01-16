@@ -41,6 +41,8 @@ common test-depends
 
 library
   import:          shared-properties
+
+  -- cabal-fmt: expand src
   exposed-modules:
     Eval
     Parser
