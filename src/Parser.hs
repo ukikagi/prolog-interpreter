@@ -49,13 +49,13 @@ term =
         )
     <|> TVar <$> idVar
     <|> TInt <$> int
-    <|> char '_' Data.Functor.$> Wild
+    <|> char '_' $> Wild
     <|> char '[' *> spaces
       *> ( do
              hds <- sepBy1 (term <* spaces) $ char ',' <* spaces
-             tl <- char '|' *> spaces *> term <|> spaces Data.Functor.$> tNil
+             tl <- char '|' *> spaces *> term <|> spaces $> tNil
              return $ foldr tCons tl hds
-             <|> spaces Data.Functor.$> tNil
+             <|> spaces $> tNil
          )
       <* char ']'
 
