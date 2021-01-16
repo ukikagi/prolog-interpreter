@@ -35,6 +35,10 @@ common shared-properties
     -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates
     -Wmissing-import-lists -Wcompat
 
+common test-depends
+  build-depends:      hspec ^>=2.7.4
+  build-tool-depends: hspec-discover:hspec-discover -any
+
 library
   import:          shared-properties
   exposed-modules:
@@ -52,12 +56,11 @@ executable prolog-interpreter
   hs-source-dirs: app
 
 test-suite prolog-interpreter-test
-  import:         shared-properties
+  import:         shared-properties, test-depends
   type:           exitcode-stdio-1.0
-  main-is:        Spec.hs
-  build-depends:
-    , hspec
-    , HUnit
-    , prolog-interpreter
-
   hs-source-dirs: test
+  main-is:        Spec.hs
+
+  -- cabal-fmt: expand test -Spec
+  other-modules:  ParserSpec
+  build-depends:  prolog-interpreter
